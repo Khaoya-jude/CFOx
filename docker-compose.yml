@@ -1,0 +1,40 @@
+version: "3.9"
+
+services:
+  cfox:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      network: host   # allows host networking for MCP
+    container_name: cfox
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+      - chroma
+    ports:
+      - "8000:8000"
+
+  postgres:
+    image: postgres:16
+    container_name: cfox-postgres
+    environment:
+      POSTGRES_USER: cfox
+      POSTGRES_PASSWORD: cfox
+      POSTGRES_DB: cfox
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  chroma:
+    image: chromadb/chroma
+    container_name: cfox-chroma
+    ports:
+      - "8001:8000"
+    volumes:
+      - chromadata:/chroma/chroma
+
+volumes:
+  pgdata:
+  chromadata:
